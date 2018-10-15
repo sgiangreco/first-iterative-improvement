@@ -83,18 +83,26 @@ class SATInstance(object):
         currentSatisfied = self.count_satisfied_clauses(self.variables)
         newSatisfied = 0
         newAssignment = []
+        nonWorseningList = []
         i = 0
         improved = -1 # 1 indicates improvement, 0 indicates same number of clauses
         while improved < 1 and i < len(self.variables):
             print('--- i = ', i, '---')
             newAssignment = self.create_neighbor(self.variables, i)
-            print('Prospective assignment: ', newAssignment)
+            #print('Prospective assignment: ', newAssignment)
             newSatisfied = self.count_satisfied_clauses(newAssignment)
             improved = newSatisfied - currentSatisfied
             print('Improvement: ', improved, '\n')
+            if improved == 0:
+                nonWorseningList.append(newAssignment)
             i = i + 1
         if improved > 0:
             self.variables = newAssignment
             return improved
-        else:
+        elif len(nonWorseningList) > 0:
+            randIndex = random.randrange(len(nonWorseningList))
+            self.variables = nonWorseningList[randIndex]
+            print('Randomly chosen flip')
             return 0
+        else:
+            return -1
